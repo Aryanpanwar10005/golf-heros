@@ -5,75 +5,70 @@
 [![Live Demo](https://img.shields.io/badge/Live-Demo-2ea043?style=for-the-badge)](https://golfheros.vercel.app)
 [![Tech Stack](https://img.shields.io/badge/Stack-Next.js%2015%20|%20Supabase%20|%20Razorpay-d29922?style=for-the-badge)](#-tech-stack)
 
-Digital Heroes Golf is a premium, subscription-based performance tracking and competition platform for golfers. Built with the **Emerald Vanguard** design system, it combines high-fidelity aesthetics with rigorous "Game of Skill" logic to deliver a state-of-the-art user experience.
+Digital Heroes Golf is a premium, subscription-based performance tracking and competition platform. This project was developed as part of the **Digital Heroes Full-Stack Assessment**, prioritizing "Game of Skill" compliance, data integrity, and high-fidelity UI/UX.
 
 ---
 
-## ✨ Key Features
+## 🔑 Test Credentials
+*Reviewers can use the following credentials to access the functional modules:*
 
-### 🟢 Emerald Vanguard Design System
-A dark-mode-first aesthetic utilizing a curated palette of **Deep Emerald**, **Burnished Gold**, and **Near-Black**. Designed for a premium, editorial feel that prioritizes visual excellence and smooth micro-interactions.
+### **User Panel**
+- **URL:** [https://golfheros.vercel.app/login](https://golfheros.vercel.app/login)
+- **Email:** `hero@test.com` (or create a new account)
+- **Password:** `password123`
+- **Features:** Score entry (1-45 range), Charity selection, Subscription dashboard.
 
-### 📊 Rolling-5 Performance Index
-Unlike static averages, our platform utilizes a **Rolling-5 SQL logic**. Every gross score entry (restricted to 1–145) automatically triggers a PostgreSQL procedure that calculates your performance index based on your 5 most recent rounds, ensuring a dynamic and fair skill representation.
+### **Admin Panel**
+- **URL:** [https://golfheros.vercel.app/admin](https://golfheros.vercel.app/admin)
+- **Email:** `admin@digitalheroes.co.in`
+- **Password:** `admin123`
+- **Features:** Draw execution logic (Random vs Algorithmic), Prize pool monitoring, User management.
 
-### 🏆 Algorithmic Draw Engine
-To maintain legal standing as a **Game of Skill**, the platform features a weighted draw execution engine. The admin can trigger draws where winners are selected based on their Performance Index consistency rather than pure randomness.
+---
 
-### 💳 Razorpay Integration
-Full subscription management lifecycle integrated with Razorpay (India). Includes secure server-side verification and automated subscription syncing.
+## ✅ Mandatory Deliverables Checklist
+- [x] **Live Website:** [golfheros.vercel.app](https://golfheros.vercel.app)
+- [x] **User Panel:** Fully functional signup, login, and dashboard.
+- [x] **Admin Panel:** Complete draw simulation and results publishing.
+- [x] **Database:** Production Supabase instance with RLS and Stored Procedures.
+- [x] **Source Code:** Clean, feature-modularized Next.js 15 structure.
+
+---
+
+## 🏗️ System Design & Architecture
+
+### **1. Data Handling: The "Rolling-5" Index**
+To meet the PRD requirement for performance tracking, I implemented the index calculation at the **Database Layer**.
+- **The Logic:** A PostgreSQL procedure (`insert_score_rolling`) ensures that only the latest 5 scores are retained per user.
+- **Why?** Offloading this to the DB ensures atomic updates and 100% data integrity, preventing race conditions during rapid score entries.
+
+### **2. Game of Skill Engine**
+The **Algorithmic Draw** logic is designed to be weighted by most/least frequent user scores. This ensures the reward system is legally distinct from luck-based lotteries, as winners are calculated based on performance metrics.
+
+### **3. Scalability Thinking**
+- **Multi-Country Support:** The schema includes `region` and `currency` flags, prepared for international expansion.
+- **Mobile-First:** The "Emerald Vanguard" design is fully responsive, utilizing a custom Tailwind v4 configuration optimized for mobile interactions.
+
+---
+
+## ⚖️ Engineering Trade-offs
+- **Razorpay Test Mode:** For this assessment, I utilized Razorpay's "Test Mode" to allow reviewers to experience the full payment flow without real financial transactions.
+- **Client-Side Hydration:** I used React Server Components (RSC) for the dashboard to maximize SEO and performance, while using Client Components for interactive modals (Score Entry) to ensure a "snappy" feel.
 
 ---
 
 ## 🛠️ Tech Stack
-
-- **Framework:** Next.js 15 (App Router)
-- **Styling:** Tailwind CSS v4 (Production-ready)
-- **Database:** Supabase (PostgreSQL) with Row-Level Security (RLS)
-- **Logic:** PL/pgSQL Stored Procedures
-- **Payments:** Razorpay Node SDK
-- **Icons:** Lucide React
+- **Frontend:** Next.js 15 (App Router), Tailwind CSS v4, Lucide Icons.
+- **Backend:** Supabase (PostgreSQL), Auth, RLS.
+- **Payments:** Razorpay Node API.
+- **Deployment:** Vercel (Edge Runtime).
 
 ---
 
-## 🏗️ Architectural Decisions
-
-### 1. Game of Skill Compliance
-The platform is architected to prioritize player performance data. Prize pools are distributed (40/35/25 tiering) based on verified score data, separating the platform from traditional "luck-based" lotteries.
-
-### 2. Zero-Trust Security
-Every table in the Supabase backend is protected by **Row-Level Security (RLS)**. Users can only access their own scores and subscription data, while the Admin panel is restricted via middleware-level role verification.
-
-### 3. Automated Performance Tracking
-By offloading the "Rolling-5" calculation to the database layer (`insert_score_rolling`), we ensure data integrity and high performance, even as the user base scales.
+## 🚀 Local Setup
+1. `npm install`
+2. Create `.env.local` using `.env.example`.
+3. `npm run dev`
 
 ---
-
-## 🚀 Getting Started
-
-1. **Clone the Repo:**
-   ```bash
-   git clone https://github.com/Aryanpanwar10005/golf-heroes-pro.git
-   ```
-
-2. **Install Dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Configure Environment:**
-   Create a `.env.local` file based on `.env.example` with your Supabase and Razorpay keys.
-
-4. **Run Locally:**
-   ```bash
-   npm run dev
-   ```
-
----
-
-## 📄 Documentation
-Detailed technical specifications and PRD assessment requirements are available in the [docs/](file:///c:/Projects/golfheros/docs) folder.
-
----
-
-**Developed for Digital Heroes Golf Performance Assessment (2026).**
+*Developed by Aryan Panwar (2026) for Digital Heroes.*
