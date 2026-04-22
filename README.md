@@ -1,101 +1,79 @@
-# Digital Heroes Golf | Full-Stack Assessment
+# 🏌️‍♂️ Digital Heroes Golf
 
-![Digital Heroes Banner](https://images.unsplash.com/photo-1535131749006-b7f58c99034b?auto=format&fit=crop&q=80&w=1200)
+### *Play for a Purpose. Track with Precision. Win with Skill.*
 
-## 🏌️‍♂️ Project Overview
-Digital Heroes is a premium, subscription-driven web application that bridges the gap between competitive golf tracking and global charitable impact. This project was developed as a technical assessment for the Full-Stack Developer selection process at **Digital Heroes**.
+[![Live Demo](https://img.shields.io/badge/Live-Demo-2ea043?style=for-the-badge)](https://golfheros.vercel.app)
+[![Tech Stack](https://img.shields.io/badge/Stack-Next.js%2015%20|%20Supabase%20|%20Razorpay-d29922?style=for-the-badge)](#-tech-stack)
 
-The platform enables golfers to track their performance, participate in monthly prize pools, and contribute to world-class charities—all through a modern, "Prestige-First" digital interface that deliberately avoids traditional golf clichés.
-
----
-
-## 🚀 Core Features
-
-### 1. Subscription & Payment Engine
-- **Flexible Plans:** Support for Monthly and discounted Yearly subscription tiers.
-- **Razorpay Integration:** Seamless, PCI-compliant payment processing (Test Mode enabled).
-- **Lifecycle Management:** Automated handling of renewals, cancellations, and state-based access control.
-
-### 2. Intelligent Score Management
-- **Stableford Tracking:** Support for scores ranging from 1–45.
-- **Rolling-5 Logic:** A custom database-level engine that retains only the latest 5 scores, automatically rotating out the oldest entries to maintain performance index integrity.
-- **Historical Accuracy:** Single-entry-per-date validation and reverse-chronological visualization.
-
-### 3. Custom Draw & Reward System
-- **Multi-Tier Winning:** Support for 5-Number, 4-Number, and 3-Number matches.
-- **Dual Draw Logic:**
-    *   **Random:** Standard high-transparency lottery generation.
-    *   **Algorithmic:** Weighted random generation based on community score frequencies (most/least frequent).
-- **Jackpot Rollover:** Built-in logic to carry forward the 5-Match pool if no winner is found.
-
-### 4. Charity Impact System
-- **Purpose-Driven Play:** Minimum 10% of all subscriptions are diverted to user-selected charities.
-- **Transparency:** Direct visualization of the user's total charitable impact on their dashboard.
-- **Independent Donations:** Support for one-time contributions outside of the subscription model.
-
-### 5. Unified Dashboards
-- **User Panel:** Real-time subscription status, score entry/edit interface, and upcoming draw participation summary.
-- **Admin Command Center:** High-privilege area for user management, draw simulation/execution, and winner verification.
+Digital Heroes Golf is a premium, subscription-based performance tracking and competition platform for golfers. Built with the **Emerald Vanguard** design system, it combines high-fidelity aesthetics with rigorous "Game of Skill" logic to deliver a state-of-the-art user experience.
 
 ---
 
-## 🛠️ Technical Stack
+## ✨ Key Features
+
+### 🟢 Emerald Vanguard Design System
+A dark-mode-first aesthetic utilizing a curated palette of **Deep Emerald**, **Burnished Gold**, and **Near-Black**. Designed for a premium, editorial feel that prioritizes visual excellence and smooth micro-interactions.
+
+### 📊 Rolling-5 Performance Index
+Unlike static averages, our platform utilizes a **Rolling-5 SQL logic**. Every gross score entry (restricted to 1–145) automatically triggers a PostgreSQL procedure that calculates your performance index based on your 5 most recent rounds, ensuring a dynamic and fair skill representation.
+
+### 🏆 Algorithmic Draw Engine
+To maintain legal standing as a **Game of Skill**, the platform features a weighted draw execution engine. The admin can trigger draws where winners are selected based on their Performance Index consistency rather than pure randomness.
+
+### 💳 Razorpay Integration
+Full subscription management lifecycle integrated with Razorpay (India). Includes secure server-side verification and automated subscription syncing.
+
+---
+
+## 🛠️ Tech Stack
+
 - **Framework:** Next.js 15 (App Router)
-- **Styling:** Tailwind CSS v4 (Emerald Vanguard Design System)
-- **Database:** Supabase (PostgreSQL) with RLS and native PL/pgSQL functions.
-- **Auth:** NextAuth.js / Supabase Auth
+- **Styling:** Tailwind CSS v4 (Production-ready)
+- **Database:** Supabase (PostgreSQL) with Row-Level Security (RLS)
+- **Logic:** PL/pgSQL Stored Procedures
+- **Payments:** Razorpay Node SDK
 - **Icons:** Lucide React
-- **Payments:** Razorpay SDK
 
 ---
 
-## 🎨 Design Philosophy
-The platform adheres to an **"Editorial Prestige"** aesthetic:
-- **Feel:** Clean, modern, and motion-enhanced.
-- **Avoidance:** Strictly prohibits traditional golf clichés (plaid, fairways, golf clubs as icons).
-- **Color Palette:**
-    *   **Emerald Green (#2ea043):** Symbolizing growth and charitable impact.
-    *   **Gold (#d29922):** Highlighting reward and achievement.
-    *   **Near-Black (#0d1117):** Providing a premium, cinematic backdrop.
+## 🏗️ Architectural Decisions
+
+### 1. Game of Skill Compliance
+The platform is architected to prioritize player performance data. Prize pools are distributed (40/35/25 tiering) based on verified score data, separating the platform from traditional "luck-based" lotteries.
+
+### 2. Zero-Trust Security
+Every table in the Supabase backend is protected by **Row-Level Security (RLS)**. Users can only access their own scores and subscription data, while the Admin panel is restricted via middleware-level role verification.
+
+### 3. Automated Performance Tracking
+By offloading the "Rolling-5" calculation to the database layer (`insert_score_rolling`), we ensure data integrity and high performance, even as the user base scales.
 
 ---
 
-## 📦 Mandatory Deliverables Checklist
-- [x] **Live Website:** Fully deployed and accessible via Vercel.
-- [x] **Database Schema:** Robust PostgreSQL structure with RLS.
-- [x] **Functional User Panel:** Signup/Login, Score Entry, Impact Tracking.
-- [x] **Admin Controls:** Winner verification and Draw execution workflows.
-- [x] **Source Code:** Clean, modular, and well-documented codebase.
+## 🚀 Getting Started
 
----
-
-## 🛠️ Getting Started
-
-### Prerequisites
-- Node.js 18+
-- Supabase Project
-- Razorpay API Keys (Test Mode)
-
-### Installation
-1. Clone the repository:
+1. **Clone the Repo:**
    ```bash
-   git clone https://github.com/your-repo/golfheros.git
+   git clone https://github.com/Aryanpanwar10005/golf-heroes-pro.git
    ```
-2. Install dependencies:
+
+2. **Install Dependencies:**
    ```bash
    npm install
    ```
-3. Set up environment variables (.env.local):
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=your_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
-   RAZORPAY_KEY_ID=your_id
-   RAZORPAY_KEY_SECRET=your_secret
-   ```
-4. Run the development server:
+
+3. **Configure Environment:**
+   Create a `.env.local` file based on `.env.example` with your Supabase and Razorpay keys.
+
+4. **Run Locally:**
    ```bash
    npm run dev
    ```
 
 ---
-*Developed for the Digital Heroes Selection Process — March 2026*
+
+## 📄 Documentation
+Detailed technical specifications and PRD assessment requirements are available in the [docs/](file:///c:/Projects/golfheros/docs) folder.
+
+---
+
+**Developed for Digital Heroes Golf Performance Assessment (2026).**
