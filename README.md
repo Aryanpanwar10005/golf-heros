@@ -1,74 +1,84 @@
-# 🏌️‍♂️ Digital Heroes Golf
+# Digital Heroes Golf
 
-### *Play for a Purpose. Track with Precision. Win with Skill.*
+A prototype of a subscription golf platform where members log their scores, a monthly prize draw runs off those scores, and part of the money goes to charity. I designed the data model and wrote the draw, prize-pool and payment logic and the main screens in Next.js and Supabase. The screens still use placeholder data, and the [Status](#status) section says exactly what is and isn't wired up.
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-2ea043?style=for-the-badge)](https://golfheros.vercel.app)
-[![Tech Stack](https://img.shields.io/badge/Stack-Next.js%2015%20|%20Supabase%20|%20Razorpay-d29922?style=for-the-badge)](#-tech-stack)
+**Live demo:** [golfheros.vercel.app](https://golfheros.vercel.app). Payments run in Razorpay **test mode** only, so no real money moves.
 
-Digital Heroes Golf is a premium, subscription-based performance tracking and competition platform. This project was developed as part of the **Digital Heroes Full-Stack Assessment**, prioritizing "Game of Skill" compliance, data integrity, and high-fidelity UI/UX.
+## How it works
 
----
+### Rolling-5 index
+The `insert_score_rolling` Postgres function inserts a new score and recalculates the player's `golf_index` as the average of their five most recent scores, in a single database call. Players can log one score per day, and gross scores must be between 1 and 145.
 
-## 🔑 Test Credentials
-*Reviewers can use the following credentials to access the functional modules:*
+### Draws
+`src/lib/draw-engine/draw-logic.ts` has two draw modes:
+- **Random:** picks 5 unique numbers from 1 to 45.
+- **Algorithmic:** a weighted random pick that favours either the most frequent or the least frequent scores in the player pool.
 
-### **User Panel**
-- **URL:** [https://golfheros.vercel.app/login](https://golfheros.vercel.app/login)
-- **Email:** `hero@test.com` (or create a new account)
-- **Password:** `password123`
-- **Features:** Score entry (1-45 range), Charity selection, Subscription dashboard.
+`countMatches` compares a player's scores with the winning numbers. Matching 3, 4 or 5 numbers puts the player in a prize tier.
 
-### **Admin Panel**
-- **URL:** [https://golfheros.vercel.app/admin](https://golfheros.vercel.app/admin)
-- **Email:** `admin@digitalheroes.co.in`
-- **Password:** `admin123`
-- **Features:** Draw execution logic (Random vs Algorithmic), Prize pool monitoring, User management.
+### Prize pool
+`src/lib/prize-pool/calculator.ts` sets the pool as a percentage of subscription revenue and splits it into 5-match (plus any rolled-over jackpot), 4-match and 3-match tiers. Each tier is shared equally among its winners. The admin screen defaults to a 40 / 35 / 25 split.
 
----
+### Payments
+Razorpay, in test mode. A server-side helper creates subscriptions, and the webhook at `/api/webhooks/razorpay` verifies the Razorpay signature before handling subscription activated, charged, cancelled and halted events.
 
-## ✅ Mandatory Deliverables Checklist
-- [x] **Live Website:** [golfheros.vercel.app](https://golfheros.vercel.app)
-- [x] **User Panel:** Fully functional signup, login, and dashboard.
-- [x] **Admin Panel:** Complete draw simulation and results publishing.
-- [x] **Database:** Production Supabase instance with RLS and Stored Procedures.
-- [x] **Source Code:** Clean, feature-modularized Next.js 15 structure.
+### Data and security
+The Supabase schema has `profiles`, `subscriptions`, `scores`, `draws` and `winners` tables. Row-level security on profiles, scores and subscriptions limits users to their own rows. A scheduled GitHub Action pings the Supabase API every three days so the free-tier project doesn't pause.
 
----
+## Status
 
-## 🏗️ System Design & Architecture
+Built and in the repo:
+- Database schema, RLS policies and the rolling-5 function
+- Draw logic (random and frequency-weighted) and prize-pool maths
+- Razorpay subscription helper and signature-checked webhook (test mode)
+- Landing, login, signup, dashboard and admin screens, deployed on Vercel
 
-### **1. Data Handling: The "Rolling-5" Index**
-To meet the PRD requirement for performance tracking, I implemented the index calculation at the **Database Layer**.
-- **The Logic:** A PostgreSQL procedure (`insert_score_rolling`) ensures that only the latest 5 scores are retained per user.
-- **Why?** Offloading this to the DB ensures atomic updates and 100% data integrity, preventing race conditions during rapid score entries.
+Not wired up yet:
+- The dashboard and admin screens show placeholder data. Submitting a score updates the screen but doesn't call Supabase.
+- The login and signup forms aren't connected to Supabase Auth, and the route guard in `middleware.ts` is a stub.
+- The admin draw buttons simulate a run. They don't call the draw functions yet.
+- The webhook logs subscription events but doesn't update the database, and the dashboard's payment button is a placeholder.
 
-### **2. Game of Skill Engine**
-The **Algorithmic Draw** logic is designed to be weighted by most/least frequent user scores. This ensures the reward system is legally distinct from luck-based lotteries, as winners are calculated based on performance metrics.
+## Tech stack
+- **Frontend:** Next.js 16 (App Router), Tailwind CSS v4, Lucide icons
+- **Backend:** Supabase (Postgres, row-level security)
+- **Payments:** Razorpay Node SDK (test mode)
+- **Hosting:** Vercel
 
-### **3. Scalability Thinking**
-- **Multi-Country Support:** The schema includes `region` and `currency` flags, prepared for international expansion.
-- **Mobile-First:** The "Emerald Vanguard" design is fully responsive, utilizing a custom Tailwind v4 configuration optimized for mobile interactions.
-
----
-
-## ⚖️ Engineering Trade-offs
-- **Razorpay Test Mode:** For this assessment, I utilized Razorpay's "Test Mode" to allow reviewers to experience the full payment flow without real financial transactions.
-- **Client-Side Hydration:** I used React Server Components (RSC) for the dashboard to maximize SEO and performance, while using Client Components for interactive modals (Score Entry) to ensure a "snappy" feel.
-
----
-
-## 🛠️ Tech Stack
-- **Frontend:** Next.js 15 (App Router), Tailwind CSS v4, Lucide Icons.
-- **Backend:** Supabase (PostgreSQL), Auth, RLS.
-- **Payments:** Razorpay Node API.
-- **Deployment:** Vercel (Edge Runtime).
-
----
-
-## 🚀 Local Setup
+## How to run
 1. `npm install`
-2. Create `.env.local` using `.env.example`.
-3. `npm run dev`
+2. Create `.env.local` with:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=
+   RAZORPAY_KEY_ID=            # test-mode key
+   RAZORPAY_KEY_SECRET=
+   RAZORPAY_WEBHOOK_SECRET=
+   ```
+3. Run `supabase/migrations/20260422_init.sql` in the Supabase SQL editor.
+4. `npm run dev`
+
+## Project structure
+```
+├── src/
+│   ├── app/
+│   │   ├── page.tsx                      # Landing page
+│   │   ├── (auth)/login, (auth)/signup   # Auth screens
+│   │   ├── (dashboard)/dashboard         # Player dashboard
+│   │   ├── (admin)/admin                 # Draw and prize-pool controls
+│   │   └── api/webhooks/razorpay         # Razorpay webhook
+│   ├── components/                       # Navigation, ScoreModal
+│   ├── lib/
+│   │   ├── draw-engine/draw-logic.ts     # Random and weighted draws
+│   │   ├── prize-pool/calculator.ts      # Pool split and per-winner prizes
+│   │   ├── razorpay/                     # Client, subscription helper, signature check
+│   │   └── supabase/                     # Supabase client
+│   └── middleware.ts                     # Route guard (stub)
+├── supabase/migrations/20260422_init.sql # Schema, RLS, rolling-5 function
+├── docs/                                 # Implementation plan and product requirements
+└── .github/workflows/keep-alive.yml      # Keeps the Supabase project awake
+```
 
 ---
-*Developed by Aryan Panwar (2026) for Digital Heroes.*
+
+Built by [Aryan Panwar](https://aryanpanwar.in).
