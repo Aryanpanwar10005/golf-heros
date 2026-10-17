@@ -5,7 +5,7 @@
 
 ## Executive Summary
 
-This is the fully corrected implementation plan for the Digital Heroes Golf Platform assignment — a subscription-driven web app combining golf score tracking, monthly prize draws, and charity fundraising. All tools below are **free**, **available in India**, and **verified as of April 2026**. This plan replaces v1.0 and incorporates all corrections including payment gateway, Vercel plan policy, and Supabase pause prevention.
+This is the fully corrected implementation plan for the Digital Heroes Golf Platform prototype — a subscription-driven web app combining golf score tracking, monthly prize draws, and charity fundraising. All tools below are **free**, **available in India**, and **verified as of April 2026**. This plan replaces v1.0 and incorporates all corrections including payment gateway, Vercel plan policy, and Supabase pause prevention.
 
 ---
 
@@ -14,7 +14,7 @@ This is the fully corrected implementation plan for the Digital Heroes Golf Plat
 | Issue | v1.0 (Wrong) | v2.0 (Correct) |
 |-------|-------------|----------------|
 | Payment Gateway | Stripe (invite-only, restricted in India) | **Razorpay** (primary) / **Cashfree** (alternate) |
-| Vercel plan | Hobby plan assumed fine for any project | Hobby = **non-commercial only**; assessment project qualifies but do NOT add real revenue |
+| Vercel plan | Hobby plan assumed fine for any project | Hobby = **non-commercial only**; prototype qualifies but do NOT add real revenue |
 | Supabase pause | Not addressed | Add GitHub Actions ping to prevent 7-day pause |
 | Stripe env vars | `STRIPE_*` | `RAZORPAY_*` / `CASHFREE_*` |
 
@@ -45,10 +45,10 @@ Framework:     Next.js 15 (App Router, TypeScript)  ← Definitive 2026 choice
 Styling:       Tailwind CSS v4 + shadcn/ui
 Database:      Supabase (PostgreSQL) — Free tier
 Auth:          Supabase Auth (email/password + magic link)
-Payments:      Razorpay (Test Mode for assessment) — PRIMARY
-               Cashfree (Sandbox for assessment) — ALTERNATE
+Payments:      Razorpay (Test Mode for the prototype) — PRIMARY
+               Cashfree (Sandbox for the prototype) — ALTERNATE
 Email:         Resend Free (3,000/month, 100/day)
-Hosting:       Vercel Hobby (non-commercial — valid for assessment)
+Hosting:       Vercel Hobby (non-commercial — valid for the prototype)
 Storage:       Supabase Storage (winner proof screenshots)
 Forms:         React Hook Form + Zod
 Icons:         Lucide React
@@ -60,18 +60,18 @@ State:         Zustand (client state only)
 
 | Service | Free Allowance | India? | Key Constraint |
 |---------|---------------|--------|----------------|
-| Vercel Hobby | 100GB bandwidth, unlimited deploys | ✅ | Non-commercial only — assessment qualifies |
+| Vercel Hobby | 100GB bandwidth, unlimited deploys | ✅ | Non-commercial only — prototype qualifies |
 | Supabase Free | 500MB DB, 50K MAUs, 1GB storage | ✅ | Pauses after 7 days inactivity → fix with cron |
 | Razorpay Test Mode | Unlimited test transactions | ✅ | No KYC needed for test/sandbox mode |
 | Cashfree Sandbox | Full sandbox, auto API keys generated | ✅ | Endpoint: `sandbox.cashfree.com` |
-| Resend Free | 3,000 emails/month, 100/day | ✅ | Sufficient for assessment |
+| Resend Free | 3,000 emails/month, 100/day | ✅ | Sufficient for the prototype |
 | GitHub Free | Unlimited private repos | ✅ | — |
 
 ---
 
 ## 3. Payment Gateway — Razorpay (Primary Choice)
 
-Razorpay is the best fit for this assessment. It has full subscription billing, is PCI-compliant (satisfying PRD §04), has a complete sandbox environment, and requires no KYC or business registration to use test mode.
+Razorpay is the best fit for this prototype. It has full subscription billing, is PCI-compliant (satisfying PRD §04), has a complete sandbox environment, and requires no KYC or business registration to use test mode.
 
 ### Why Razorpay Over Cashfree for This Project
 
@@ -133,7 +133,7 @@ Razorpay is the best fit for this assessment. It has full subscription billing, 
 
 ## 4. Supabase Pause Prevention
 
-Free tier projects pause after **7 consecutive days of inactivity**. For an assessment, the reviewer will visit your live URL — if it's paused, it fails. Fix this with a GitHub Actions scheduled workflow.
+Free tier projects pause after **7 consecutive days of inactivity**. For a prototype, visitors will open your live URL — if it's paused, it fails. Fix this with a GitHub Actions scheduled workflow.
 
 ### GitHub Actions Cron (copy from `travisvn/supabase-pause-prevention`)
 
@@ -760,7 +760,7 @@ Install: `npm install resend @react-email/components`
 | `proof-approved.tsx` | Admin approves verification | Congratulations, payment timeline |
 | `proof-rejected.tsx` | Admin rejects | Reason from admin_notes, resubmit instructions |
 
-Resend free tier: 3,000/month, 100/day — sufficient for this assessment.
+Resend free tier: 3,000/month, 100/day — sufficient for this prototype.
 
 ---
 
@@ -798,7 +798,7 @@ NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
 1. Create fresh GitHub private repo (not your personal account — use a separate org or new account if required)
 2. Create new Supabase project → run all SQL migrations → seed prize_pool_config
 3. Create Razorpay account → test mode → create two Plans (monthly + yearly) → note Plan IDs
-4. Create Resend account → verify domain OR use Resend's test domain for assessment
+4. Create Resend account → verify domain OR use Resend's test domain for the prototype
 5. Create new Vercel account (not personal) → connect GitHub repo → add all env vars
 6. Add GitHub Actions keep-alive workflow for Supabase
 7. Set Razorpay webhook endpoint in dashboard: https://your-app.vercel.app/api/webhooks/razorpay
@@ -810,8 +810,8 @@ NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
 - Build command: `next build`
 - Node.js version: 20.x
 - Every `git push` to `main` auto-deploys
-- Check "Vercel Hobby" fair use: assessment project with no real revenue = non-commercial ✅
-- Do NOT collect real money during assessment period (test mode only)
+- Check "Vercel Hobby" fair use: prototype with no real revenue = non-commercial ✅
+- Do NOT collect real money during prototype period (test mode only)
 
 ### Razorpay Webhook Configuration
 
@@ -942,7 +942,7 @@ For local testing: use `ngrok http 3000` → use ngrok URL in Razorpay webhook d
 | When are draw entries frozen? | At publish time — Server Action snapshots each active subscriber's current 5 scores into `draw_entries`. Scores entered after publish do not count for that draw. |
 | Can users change charity after signup? | Yes — `user_charity_selections` is updatable. Changes apply from next month. |
 | What does "algorithmic draw" mean exactly? | Two sub-modes: (a) weighted toward most-frequent scores across all users, (b) weighted toward least-frequent. Admin selects per draw. |
-| Currency? | GBP (£) assumed from PRD context (digitalheroes.co.in). Razorpay test mode in INR is fine for assessment — label amounts clearly in UI. |
+| Currency? | GBP (£) assumed from PRD context (digitalheroes.co.in). Razorpay test mode in INR is fine for the prototype — label amounts clearly in UI. |
 | Independent donation (PRD §08)? | Separate "Donate" button on charity profile pages → Razorpay one-time payment order (not a subscription). |
 | What if a user has fewer than 5 scores at draw time? | Include them in draw with however many scores they have. Match can only occur on values that exist. Flag in UI: "Enter all 5 scores to maximise your chances." |
 | Admin score editing (PRD §11)? | Admin can edit any user's scores via the user management panel. Same validation rules (1–45, no future dates, no duplicate dates). |
